@@ -8,6 +8,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"greenlight.jaswanthp.com/internal/data"
+	"greenlight.jaswanthp.com/internal/validator"
 )
 
 func (app *application) readParamID(r *http.Request) (int64, error) {
@@ -35,6 +36,21 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	err := app.decodeJson(w, r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
+	}
+
+	// create a new validator struct
+	v := validator.New()
+
+	movie := &data.Movie{
+		Title:   input.Title,
+		Runtime: input.Runtime,
+		Year:    input.Year,
+		Genres:  input.Genres,
+	}
+
+	if data.ValidateMovie(v, movie); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
 	}
 
 	fmt.Printf("%+v\n", input)
