@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
+
+	"greenlight.jaswanthp.com/internal/validator"
 )
 
 type envolope map[string]interface{}
@@ -117,4 +121,38 @@ func (app *application) decodeJson(w http.ResponseWriter, r *http.Request, dst i
 
 	return nil
 
+}
+func (app *application) readString(qs url.Values, key string, defaultvalue string) string {
+
+	s := qs.Get(key)
+
+	if s == "" {
+		return defaultvalue
+	}
+	return s
+}
+
+func (app *application) readCSV(qs url.Values, key string, defaultvalue []string) []string {
+	s := qs.Get(key)
+
+	if s == "" {
+		return defaultvalue
+	}
+
+	return strings.Split(s, ",")
+}
+
+func (app *application) readInt(qs url.Values, key string, defaultvalue int, v *validator.Validator) int {
+	i := qs.Get(key)
+
+	if i == "" {
+		return defaultvalue
+	}
+
+	n, err := strconv.Atoi(i)
+	if err != nil {
+		v.AddError(key, "must be an integer")
+		return defaultvalue
+	}
+	return n
 }
