@@ -1,6 +1,7 @@
 package data
 
 import (
+	"math"
 	"strings"
 
 	"greenlight.jaswanthp.com/internal/validator"
@@ -46,4 +47,27 @@ func (f Filters) limit() int {
 
 func (f Filters) offSet() int {
 	return (f.Page - 1) * f.PageSize
+}
+
+type MetaData struct {
+	CurrentPage  int `json:"current_page,omitempty"`
+	PageSize     int `json:"page_size,omitempty"`
+	FirstPage    int `json:"first_page,omitempty"`
+	LastPage     int `json:"last_page,omitempty"`
+	TotalRecords int `json:"total_records,omitempty"`
+}
+
+func CalculateMetaData(totalrecords, page, page_size int) MetaData {
+	if totalrecords == 0 {
+		return MetaData{}
+	}
+
+	return MetaData{
+		CurrentPage:  page,
+		PageSize:     page_size,
+		FirstPage:    1,
+		LastPage:     int(math.Ceil(float64(totalrecords) / float64(page_size))),
+		TotalRecords: totalrecords,
+	}
+
 }
