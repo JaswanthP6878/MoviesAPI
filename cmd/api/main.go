@@ -12,6 +12,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"greenlight.jaswanthp.com/internal/data"
+	"greenlight.jaswanthp.com/internal/jsonlog"
 )
 
 const version = "1.0.0"
@@ -29,8 +30,8 @@ type config struct {
 
 type application struct {
 	config config
-	logger *log.Logger
 	models data.Models
+	logger *jsonlog.Logger
 }
 
 func main() {
@@ -48,16 +49,17 @@ func main() {
 
 	flag.Parse()
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	// logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
 
 	db, err := OpenDB(cfg)
 	if err != nil {
-		logger.Fatal(err)
+		logger.PrintFatal(err, nil)
 	}
 
 	defer db.Close()
 
-	logger.Printf("database connection pool established")
+	logger.PrintInfo("database has been connectecd", nil)
 
 	app := &application{
 		config: cfg,
@@ -69,15 +71,19 @@ func main() {
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
+		ErrorLog:     log.New(logger, "", 0),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
-	logger.Printf("Server has started at port %d", cfg.port)
+	logger.PrintInfo("Starting Server", map[string]string{
+		"addr": srv.Addr,
+		"env":  cfg.env,
+	})
 	err = srv.ListenAndServe()
 
 	if err != nil {
-		logger.Fatal(err)
+		logger.PrintFatal(err, nil)
 	}
 
 }
