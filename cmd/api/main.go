@@ -4,9 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"fmt"
-	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -76,23 +73,9 @@ func main() {
 		models: data.NewModels(db),
 	}
 
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ErrorLog:     log.New(logger, "", 0),
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
-	}
-
-	logger.PrintInfo("Starting Server", map[string]string{
-		"addr": srv.Addr,
-		"env":  cfg.env,
-	})
-	err = srv.ListenAndServe()
-
+	err = app.serve()
 	if err != nil {
-		logger.PrintFatal(err, nil)
+		logger.PrintError(err, nil)
 	}
 
 }
