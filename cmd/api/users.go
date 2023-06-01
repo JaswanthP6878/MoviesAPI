@@ -55,6 +55,17 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go func() {
+		err = app.mailer.Send(user.Email, "user_welcome.tmpl.html", user)
+		if err != nil {
+			// Importantly, if there is an error sending the email then we use the
+			// app.logger.PrintError() helper to manage it, instead of the
+			// app.serverErrorResponse() helper like before.
+			app.logger.PrintError(err, nil)
+		}
+
+	}()
+
 	err = app.writeJson(w, http.StatusCreated, envolope{"user": user}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
