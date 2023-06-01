@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"greenlight.jaswanthp.com/internal/data"
@@ -56,6 +57,12 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
+
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.PrintError(fmt.Errorf("%s", err), nil)
+			}
+		}()
 		err = app.mailer.Send(user.Email, "user_welcome.tmpl.html", user)
 		if err != nil {
 			// Importantly, if there is an error sending the email then we use the

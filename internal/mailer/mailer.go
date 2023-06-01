@@ -55,7 +55,9 @@ func (m Mailer) Send(recipient, templateFile string, data interface{}) error {
 	}
 	// Use the mail.NewMessage() function to initialize a new mail.Message instance.
 	// Then we use the SetHeader() method to set the email recipient, sender and subject
-	// headers, the SetBody() method to set the plain-text body, and the AddAlternative() // method to set the HTML body. It's important to note that AddAlternative() should // always be called *after* SetBody().
+	// headers, the SetBody() method to set the plain-text body, and the AddAlternative()
+	// method to set the HTML body. It's important to note that AddAlternative() should
+	// always be called *after* SetBody().
 	msg := mail.NewMessage()
 	msg.SetHeader("To", recipient)
 	msg.SetHeader("From", m.sender)
