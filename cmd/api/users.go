@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"greenlight.jaswanthp.com/internal/data"
 	"greenlight.jaswanthp.com/internal/validator"
@@ -55,8 +56,20 @@ func (app *application) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token, err := app.models.Tokens.New(int64(user.Id), 3*24*time.Hour, data.ScopeActivation)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
 	app.background(func() {
-		err = app.mailer.Send(user.Email, "user_welcome.tmpl.html", user)
+		// envolope of data for sending both the userID and password.
+		data := map[string]interface{}{
+			"activationToken": token.Plaintext,
+			"userID":          user.Id,
+		}
+
+		err = app.mailer.Send(user.Email, "user_welcome.tmpl.html", data)
 		if err != nil {
 			// Importantly, if there is an error sending the email then we use the
 			// app.logger.PrintError() helper to manage it, instead of the

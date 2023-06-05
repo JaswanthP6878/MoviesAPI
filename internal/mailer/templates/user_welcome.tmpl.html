@@ -2,13 +2,17 @@
 
 {{define "plainBody"}} 
 Hi,
-Thanks for signing up for a Greenlight account. We're excited to have you on board!
+Thanks for signing up for a moviesApi account. 
+We're excited to have you on board! 
+For future reference, your user ID number is {{.userID}}.
 
-For future reference, your user ID number is {{.Id}}.
+Please send a request to the `PUT /v1/users/activated` endpoint with the following JSON body to activate your account:
+{"token": "{{.activationToken}}"}
+
+Please note that this is a one-time use token and it will expire in 3 days.
 
 Thanks,
 
-The moviesApi Team
 {{end}}
 
 
@@ -23,10 +27,10 @@ The moviesApi Team
 
     <body>
         <p>Hi,</p>
-        <p>Thanks for signing up for a Greenlight account. We're excited to have you on board!</p>
+        <p>Thanks for signing up for a moviesApi account. We're excited to have you on board!</p>
         <p>For future reference, your user ID number is {{.Id}}.</p>
         <p>Thanks,</p>
-        <p>The Greenlight Team</p>
+        <p>The moviesApi Team</p>
     </body>
 
 </html> 
