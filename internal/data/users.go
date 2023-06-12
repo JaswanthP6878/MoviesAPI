@@ -15,7 +15,7 @@ var (
 	ErrDuplicateMail = errors.New("duplicate email")
 )
 
-var anonymousUser = &User{}
+var AnonymousUser = &User{}
 
 type User struct {
 	Id        int       `json:"id"`
@@ -28,7 +28,7 @@ type User struct {
 }
 
 func (u *User) isAnanonymous() bool {
-	return u == anonymousUser
+	return u == AnonymousUser
 }
 
 type password struct {
